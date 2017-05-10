@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        ".xonshrc": "shellscript",
+        "*.txt": "plaintext",
+        "iterator": "cpp",
+        "vector": "cpp"
+    }
+}

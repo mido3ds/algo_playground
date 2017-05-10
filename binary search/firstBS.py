@@ -1,0 +1,1 @@
+''' 0 0 0 0 1 1 1 1 search binary to get index of first 1 '''
