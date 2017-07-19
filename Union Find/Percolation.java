@@ -1,15 +1,18 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
-    private int n;
-    private WeightedQuickUnionUF uf;
+    private final int n;
+    private final WeightedQuickUnionUF uf;
+    private final int lastCellPos;
     private boolean[] open;
+    private int numOfOpen = 0;
 
     // create n-by-n grid, with all sites blocked
     public Percolation(int n) {
         if (n <= 0) throw new java.lang.IllegalArgumentException("n cant be <= 0");
 
         this.n = n;
+        this.lastCellPos = n * (n + 2) - 1;
 
         // array is from 0 to n - 1 and put header and footer
         uf = new WeightedQuickUnionUF(n * (n + 2));
@@ -23,16 +26,22 @@ public class Percolation {
     // open site (row, col) if it is not open already
     public void open(int row, int col) {
         // check in range
-        if (!isValidPosition(row, col)) throw new java.lang.IndexOutOfBoundsException();
+        if (!isValidPosition(row, col)) throw new java.lang.IllegalArgumentException();
 
-        open[getPosition(row, col)] = true;
+        int pos = getPosition(row, col);
+        if (open[pos]) return;
+
+        open[pos] = true;
+        numOfOpen++;
 
         int[][] ne = getNeighbours(row, col);
         for (int i = 0; i < ne.length; i++) {
+            if (ne[i][0] == -1) break;
             if (isOpen(ne[i][0], ne[i][1])) {
-                uf.union(getPosition(row, col), getPosition(ne[i][0], ne[i][1]));
+                uf.union(pos, getPosition(ne[i][0], ne[i][1]));
             }
         }
+
     }
 
     // is site (row, col) open?
@@ -48,23 +57,13 @@ public class Percolation {
 
     // number of open sites
     public int numberOfOpenSites() {
-        int num = 0;
-
-        for (int row = 1; row <= n; row++) {
-            for (int col = 1; col <= n; col++) {
-                if (isOpen(row, col)) {
-                    num++;
-                }
-            }
-        }
-
-        return num;
+        return numOfOpen;
     }
 
     // does the system percolate?
     // is there a connection between last and first ?
     public boolean percolates() {
-        return uf.connected(0, n * (n + 2) - 1);
+        return uf.connected(0, lastCellPos);
     }
 
     // test client (optional)
@@ -93,24 +92,6 @@ public class Percolation {
         System.out.println("all tests are ok");
     }
 
-    private void testNeighbours() {
-        // test getneighbours
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
-                System.out.println("sending: \n" + i + ", " + j);
-
-                int[][] arr = getNeighbours(i, j);
-
-                System.out.println("received: ");
-                for (int m = 0; m < arr.length; m++) {
-                    System.out.print("(" + arr[m][0] + ", " + arr[m][1] + ")");
-                }
-
-                System.out.println("\n***********");
-            }
-        }
-    }
-
     // check row,col in range [1, n]
     private boolean isValidPosition(int row, int col) {
         return ((row > 0 && row <= n) && (col > 0 && col <= n));
@@ -124,7 +105,7 @@ public class Percolation {
     // row,col in range [1, n]
     private int getPosition(int row, int col) {
         // check in range
-        if (!isValidPositionWithPadding(row, col)) throw new java.lang.IndexOutOfBoundsException();
+        if (!isValidPositionWithPadding(row, col)) throw new java.lang.IllegalArgumentException();
 
         // row will stay as it is, because of pading
         // col is 0 indexed
@@ -135,7 +116,8 @@ public class Percolation {
 
     // return array of neghbours row & col
     private int[][] getNeighbours(int row, int col) {
-        int[][] ne = new int[4][2];
+        final int sizeOfNe = 4;
+        int[][] ne = new int[sizeOfNe][2];
         int j = 0;
 
         // make all rows and cols = -1
@@ -162,31 +144,25 @@ public class Percolation {
             }
         }
 
-        // get num of -1, to delete them from array later
-        int numN1 = 0;
-        for (int i = 0; i < ne.length; i++) {
-            if (ne[i][0] == -1) {
-                numN1++;
-            }
-        }
-
-        // create new array if zeroes found
-        if (numN1 > 0) {
-            int[][] newNe = new int[4 - numN1][2];
-            j = 0;
-            // copy
-            for (int i = 0; i < ne.length; i++) {
-                if (ne[i][0] != -1) {
-                    newNe[j][0] = ne[i][0];
-                    newNe[j++][1] = ne[i][1];
-                }
-            }
-
-            // update ne
-            ne = newNe;
-        }
-
         return ne;
+    }
+
+    private void testNeighbours() {
+        // test getneighbours
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                System.out.println("sending: \n" + i + ", " + j);
+
+                int[][] arr = getNeighbours(i, j);
+
+                System.out.println("received: ");
+                for (int m = 0; m < arr.length; m++) {
+                    System.out.print("(" + arr[m][0] + ", " + arr[m][1] + ")");
+                }
+
+                System.out.println("\n***********");
+            }
+        }
     }
 
     // connect elements of header and elements of footer

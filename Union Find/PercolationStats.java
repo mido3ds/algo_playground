@@ -1,12 +1,11 @@
 import edu.princeton.cs.algs4.StdRandom;
 
 public class PercolationStats {
-    private int n;
+    private final int n;
     private double mean;
     private double stddev;
     private double confHi;
     private double confLow;
-
     private double[] experiment;
 
     // perform trials independent experiments on an n-by-n grid
@@ -100,8 +99,6 @@ public class PercolationStats {
 
     // return random col and row where there is an closed block
     private int[] getRandomClosedBlock(Percolation model) {
-        StdRandom.setSeed(System.currentTimeMillis());
-
         int[] arr = new int[2];
         do {
             arr[0] = StdRandom.uniform(1, n + 1);
