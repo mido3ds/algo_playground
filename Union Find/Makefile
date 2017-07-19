@@ -12,7 +12,7 @@ compile:
 all: compile run
 
 run:
-	java -classpath '.:$(class_path)' $(run_file) && echo finished running || echo error
+	java -ea -classpath '.:$(class_path)' $(run_file) && echo finished running || echo error
 
 clean:
 	rm *.log* *.class

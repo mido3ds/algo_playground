@@ -11,7 +11,7 @@
             "options": [
                 "-classpath",
                 "'.:algs4.jar'", "${fileBasenameNoExtension}",
-                "200 100"
+                "2 2"
             ],
             "externalConsole": true
         },
