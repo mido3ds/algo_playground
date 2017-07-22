@@ -1,0 +1,8 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "javac-linter.javac": "javac-algs4",
+    "javac-linter.classpath": [
+        "algs4.jar"
+    ],
+    "java.configuration.updateBuildConfiguration": "automatic"
+}
