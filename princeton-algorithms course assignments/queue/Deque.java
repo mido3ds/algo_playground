@@ -3,13 +3,8 @@ import java.util.*;
 
 public class Deque<Item> implements Iterable<Item> {
     private Item[] array;
-    private int r = 1, l = 1;
+    private int first = -1, last = -1;
     private int size = 0;
-
-    /** construct an empty deque */
-    public Deque() {
-        array = (Item[]) new Object[3];
-    }
 
     /** is the deque empty? */
     public boolean isEmpty() {
@@ -25,113 +20,140 @@ public class Deque<Item> implements Iterable<Item> {
     public void addFirst(Item item) {
         if (item == null) throw new java.lang.IllegalArgumentException();
 
-        if (r == array.length - 1) {
-            increaseToRight();
+        // empty
+        if (size == 0) {
+            array = (Item[]) new Object[2];
+            first = 0;
+            last = first;
+        } else {
+            // special case: at end from left
+            if (first == 0) {
+                increaseToLeft();
+            }
+            first--;
         }
 
-        array[++r] = item;
+        array[first] = item;
         size++;
-    }
-
-    private void increaseToRight() {
-        assert size != 0;
-
-        Item[] newArray = (Item[]) new Object[3 / 2 * size];
-
-        // copy
-        for (int i = l; i <= r; i++) {
-            newArray[i] = array[i];
-        }
-
-        array = newArray;
     }
 
     /** add the item to the end */
     public void addLast(Item item) {
         if (item == null) throw new java.lang.IllegalArgumentException();
 
-        if (l == 0) {
-            increaseToLeft();
+        // empty
+        if (size == 0) {
+            array = (Item[]) new Object[2];
+            last = 1;
+            first = last;
+        } else {
+            // special case: at end from right
+            if (last == array.length - 1) {
+                increaseToRight();
+            }
+            last++;
         }
 
-        array[--l] = item;
+        array[last] = item;
         size++;
-    }
-
-    private void increaseToLeft() {
-        assert size != 0;
-
-        int addedSize = size / 2;
-        Item[] newArray = (Item[]) new Object[size + addedSize];
-
-        /** copy */
-        for (int i = l; i <= r; i++) {
-            newArray[addedSize + i] = array[i];
-        }
-
-        l += addedSize;
-        r += addedSize;
-
-        array = newArray;
     }
 
     /** remove and return the item from the front */
     public Item removeFirst() {
         if (size == 0) throw new java.util.NoSuchElementException();
 
-        Item item = array[r];
+        Item item = array[first];
 
-        r++;
+        first++;
         size--;
 
-        int leftSpace = r;
-        if (size < leftSpace * 2) shrinkFromLeft();
+        int leftSpace = first;
+        if (leftSpace > 2 * size) shrinkFromLeft();
 
         return item;
-    }
-
-    /** left space gets .5 smaller */
-    private void shrinkFromLeft() {
-        assert size != 0;
-
-        int removedSpace = r / 2;
-        Item[] newArray = (Item[]) new Object[array.length - removedSpace];
-
-        // copy
-        for (int i = l; i <= r; i++) {
-            newArray[i - removedSpace] = array[i];
-        }
-
-        r -= removedSpace;
-        l -= removedSpace;
     }
 
     /** remove and return the item from the end */
     public Item removeLast() {
         if (size == 0) throw new java.util.NoSuchElementException();
 
-        Item item = array[l];
+        Item item = array[last];
 
-        l--;
+        last--;
         size--;
 
-        int leftSpace = array.length - l;
-        if (size < leftSpace * 2) shrinkFromRight();
+        int leftSpace = array.length - last;
+        if (leftSpace > 2 * size) shrinkFromLeft();
 
         return item;
     }
 
-    /** right space gets .5 smaller */
-    private void shrinkFromRight() {
-        assert size != 0;
+    private void increaseToRight() {
+        if (size == 0) return;
 
-        int removedSpace = (array.length - l) / 2;
+        int addedSize = (int) Math.ceil(size / 2.0);
+        Item[] newArray = (Item[]) new Object[array.length + addedSize];
+
+        // copy
+        for (int i = first; i <= last; i++) {
+            newArray[i] = array[i];
+        }
+
+        array = newArray;
+    }
+
+    private void increaseToLeft() {
+        if (size == 0) return;
+
+        int addedSize = (int) Math.ceil(size / 2f);
+        Item[] newArray = (Item[]) new Object[array.length + addedSize];
+
+        /** copy */
+        for (int i = first; i <= last; i++) {
+            newArray[addedSize + i] = array[i];
+        }
+
+        first += addedSize;
+        last += addedSize;
+
+        array = newArray;
+    }
+
+    /** left space gets .5 smaller */
+    private void shrinkFromLeft() {
+        assert array.length != 0;
+        if (size == 0) return;
+
+        int removedSpace = (int) Math.ceil(size / 2.0);
+        assert size <= array.length - removedSpace;
         Item[] newArray = (Item[]) new Object[array.length - removedSpace];
 
         // copy
-        for (int i = l; i <= r; i++) {
+        for (int i = first; i <= last; i++) {
+            newArray[i - removedSpace] = array[i];
+        }
+
+        last -= removedSpace;
+        first -= removedSpace;
+
+        array = newArray;
+    }
+
+    /** right space gets .5 smaller */
+    private void shrinkFromRight() {
+        assert array.length != 0;
+        if (size == 0) return;
+
+        int removedSpace = (int) Math.ceil(size / 2.0);
+        assert size <= array.length - removedSpace;
+        Item[] newArray = (Item[]) new Object[array.length - removedSpace];
+
+        // copy
+        for (int i = first; i <= last; i++) {
             newArray[i] = array[i];
         }
+
+        array = newArray;
     }
 
     /** return an iterator over items in order from front to end */
@@ -144,18 +166,18 @@ public class Deque<Item> implements Iterable<Item> {
         private Deque<Item> deq;
 
         public DequeIterator(Deque<Item> d) {
-            index = d.r;
+            index = d.first;
             deq = d;
 
             assert deq != null && index >= 0;
         }
 
         public boolean hasNext() {
-            return deq.l != index + 1;
+            return index + 1 != deq.last;
         }
 
         public Item next() {
-            if (!hasNext()) throw new java.util.NoSuchElementException();
+            if (index > deq.last) throw new java.util.NoSuchElementException();
 
             return deq.array[index++];
         }
@@ -177,7 +199,7 @@ public class Deque<Item> implements Iterable<Item> {
         assert d.isEmpty();
         d.addFirst(arr[0]);
         d.addLast(arr[1]);
-        assert d.size() == arr.length;
+        assert d.size() == 2;
         d.checkRepresentation();
         assert d.removeFirst() == arr[0];
         assert d.removeFirst() == arr[1];
@@ -195,10 +217,10 @@ public class Deque<Item> implements Iterable<Item> {
             i--;
             assert s == arr[i];
         }
-        assert d.removeFirst() == arr[0];
-        assert d.removeFirst() == arr[1];
+        assert d.removeLast() == arr[0];
+        assert d.removeLast() == arr[1];
         d.checkRepresentation();
-        assert d.removeLast() == arr[arr.length - 1];
+        assert d.removeFirst() == arr[arr.length - 1];
         assert !d.isEmpty();
         d.checkRepresentation();
         int nowSize = d.size();
@@ -209,26 +231,32 @@ public class Deque<Item> implements Iterable<Item> {
         d.checkRepresentation();
         assert d.size() == nowSize && nowSize == 0;
 
-        // third, aggressive
+        // third, stress
         d = new Deque<>();
         String someString = "habal";
         for (i = 0; i < 50000; i++) {
-            d.addFirst(someString);
-            d.addLast(someString);
+            String someOtherString = someString + "Foo";
+
+            d.addFirst(someOtherString);
+            d.addLast(someOtherString);
         }
         d.checkRepresentation();
         assert d.size() == 50000 * 2;
         for (i = 0; i < 50000; i++) {
-            assert d.removeLast() == d.removeFirst();
+            if (d.removeLast() == d.removeFirst()) System.out.println("yes #" + i);
         }
         d.checkRepresentation();
     }
 
     /** couple of assertions */
     private void checkRepresentation() {
-        assert size >= 0;
-        assert l >= r;
-        assert r >= 0;
+        if (size == 0) return;
+
+        assert size > 0;
+        assert size <= array.length;
+        assert last >= first;
+        assert first >= 0;
+        assert last < array.length;
 
         int len = array.length;
         increaseToLeft();
@@ -241,6 +269,6 @@ public class Deque<Item> implements Iterable<Item> {
         assert array.length == len;
 
         Iterator<Item> itr = iterator();
-        assert itr.next() == array[r];
+        assert itr.next() == array[first];
     }
 }

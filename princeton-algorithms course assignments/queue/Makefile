@@ -1,5 +1,5 @@
 class_path = algs4.jar
-cmp_file = *.java
+cmp_file = Deque.java
 run_file = Deque
 
 cmp_optns = -g 

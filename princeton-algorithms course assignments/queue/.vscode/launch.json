@@ -9,9 +9,11 @@
             "cwd": "${fileDirname}",
             "startupClass": "${fileBasename}",
             "options": [
-                "-classpath",
-                "'.:algs4.jar'", "${fileBasenameNoExtension}",
-                "2 2"
+                "-ea",
+                "${fileBasenameNoExtension}"
+            ],
+            "classpath": [
+                "'.:algs4.jar'"
             ],
             "externalConsole": true
         },
@@ -24,9 +26,11 @@
             "startupClass": "${fileBasename}",
             "jdkPath": ".",
             "options": [
-                "-classpath",
-                "algs4.jar",
-                "\"${fileDirname}\""
+                "-ea",
+                "${fileBasenameNoExtension}"
+            ],
+            "classpath": [
+                "'.:algs4.jar'"
             ],
             "externalConsole": true
         }
