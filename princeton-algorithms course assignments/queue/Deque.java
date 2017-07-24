@@ -163,9 +163,11 @@ public class Deque<Item> implements Iterable<Item> {
 
     private class DequeIterator<Item> implements Iterator<Item> {
         private int index;
-        private Deque<Item> deq;
+        private final Deque<Item> deq;
 
         public DequeIterator(Deque<Item> d) {
+            assert d != null;
+
             index = d.first;
             deq = d;
 
@@ -201,11 +203,11 @@ public class Deque<Item> implements Iterable<Item> {
         d.addLast(arr[1]);
         assert d.size() == 2;
         d.checkRepresentation();
-        assert d.removeFirst() == arr[0];
-        assert d.removeFirst() == arr[1];
+        assert d.removeFirst().equals(arr[0]);
+        assert d.removeFirst().equals(arr[1]);
         d.checkRepresentation();
         d.addFirst(arr[1]);
-        assert d.removeLast() == arr[1];
+        assert d.removeLast().equals(arr[1]);
         d.checkRepresentation();
         assert d.isEmpty();
 
@@ -215,12 +217,12 @@ public class Deque<Item> implements Iterable<Item> {
         int i = arr.length;
         for (String s : d) {
             i--;
-            assert s == arr[i];
+            assert s.equals(arr[i]);
         }
-        assert d.removeLast() == arr[0];
-        assert d.removeLast() == arr[1];
+        assert d.removeLast().equals(arr[0]);
+        assert d.removeLast().equals(arr[1]);
         d.checkRepresentation();
-        assert d.removeFirst() == arr[arr.length - 1];
+        assert d.removeFirst().equals(arr[arr.length - 1]);
         assert !d.isEmpty();
         d.checkRepresentation();
         int nowSize = d.size();

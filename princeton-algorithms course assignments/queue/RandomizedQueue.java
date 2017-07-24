@@ -60,7 +60,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     }
 
     private class RandomizedQueueIterator<Item> implements Iterator<Item> {
-        private RandomizedQueue<Item> rq;
+        private final RandomizedQueue<Item> rq;
         private int index = 0;
 
         public RandomizedQueueIterator(RandomizedQueue<Item> rq) {
@@ -98,7 +98,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         int i = 0, cnt = 0;
         for (String s : rq) {
             if (i == arr.length) break;
-            if (s == arr[i]) cnt++;
+            if (s.equals(arr[i])) cnt++;
             i++;
         }
         assert cnt != arr.length;
@@ -108,8 +108,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         System.out.println("all tests passed");
     }
 
-    private Item[] createGenericArray(int size) {
-        return (Item[]) new Object[size];
+    private Item[] createGenericArray(int newSize) {
+        return (Item[]) new Object[newSize];
     }
 
     private int getRandomNumInRange() {
