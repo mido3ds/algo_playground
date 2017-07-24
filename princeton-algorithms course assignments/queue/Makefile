@@ -1,6 +1,6 @@
 class_path = algs4.jar
-cmp_file = Deque.java
-run_file = Deque
+cmp_file = Permutation.java
+run_file = Permutation
 
 cmp_optns = -g 
 cmp_optns += -classpath .:$(class_path)

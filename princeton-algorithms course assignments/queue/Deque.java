@@ -1,5 +1,4 @@
 import java.util.Iterator;
-import java.util.*;
 
 public class Deque<Item> implements Iterable<Item> {
     private Item[] array;
@@ -63,6 +62,7 @@ public class Deque<Item> implements Iterable<Item> {
         if (size == 0) throw new java.util.NoSuchElementException();
 
         Item item = array[first];
+        array[first] = null;
 
         first++;
         size--;
@@ -78,12 +78,13 @@ public class Deque<Item> implements Iterable<Item> {
         if (size == 0) throw new java.util.NoSuchElementException();
 
         Item item = array[last];
+        array[last] = null;
 
         last--;
         size--;
 
         int leftSpace = array.length - last;
-        if (leftSpace > 2 * size) shrinkFromLeft();
+        if (leftSpace > 2 * size) shrinkFromRight();
 
         return item;
     }
@@ -121,13 +122,13 @@ public class Deque<Item> implements Iterable<Item> {
 
     /** left space gets .5 smaller */
     private void shrinkFromLeft() {
-        assert array.length != 0;
         if (size == 0) return;
 
         int removedSpace = (int) Math.ceil(size / 2.0);
         assert size <= array.length - removedSpace;
         Item[] newArray = (Item[]) new Object[array.length - removedSpace];
-
+        
+        if (removedSpace > first) removedSpace = first;
         // copy
         for (int i = first; i <= last; i++) {
             newArray[i - removedSpace] = array[i];
@@ -141,7 +142,6 @@ public class Deque<Item> implements Iterable<Item> {
 
     /** right space gets .5 smaller */
     private void shrinkFromRight() {
-        assert array.length != 0;
         if (size == 0) return;
 
         int removedSpace = (int) Math.ceil(size / 2.0);
@@ -243,9 +243,12 @@ public class Deque<Item> implements Iterable<Item> {
         d.checkRepresentation();
         assert d.size() == 50000 * 2;
         for (i = 0; i < 50000; i++) {
-            if (d.removeLast() == d.removeFirst()) System.out.println("yes #" + i);
+            assert d.removeFirst() == d.removeLast();
         }
         d.checkRepresentation();
+
+
+        System.out.println("all tests passed");
     }
 
     /** couple of assertions */
